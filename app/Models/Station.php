@@ -11,9 +11,9 @@ class Station extends Model
     protected $primaryKey = 'name';
     protected $fillable = ['name', 'longitude', 'latitude', 'elevation'];
 
-    public function geolocations()
+    public function geolocation()
     {
-        return $this->hasMany(Geolocation::class, 'station_name');
+        return $this->hasOne(Geolocation::class, 'station_name', 'name');
     }
 
     public function nearestLocations()
