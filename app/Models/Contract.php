@@ -9,7 +9,7 @@ class Contract extends Model
     protected $table = 'contracts';
     public $timestamps = false;
     protected $primaryKey = 'id';
-    protected $fillable = ['salesperson_id', 'organization_id', 'timestamp', 'country_code', 'administrative_region1', 'administrative_region2', 'longitude', 'latitude', 'elevation', 'api_key'];
+    protected $fillable = ['salesperson_id', 'organization_id', 'timestamp', 'country_code', 'max_longitude', 'min_longitude', 'max_latitude', 'min_latitude', 'max_elevation', 'min_elevation', 'api_key'];
 
     public function salesperson()
     {
