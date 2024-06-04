@@ -38,4 +38,64 @@ class ContractController extends Controller
 
         return response()->json($weatherData);
     }
+
+
+    public function getWarmestStations(Request $request)
+    {
+        $apiKey = $request->header('api-key');
+
+        $contract = Contract::where('api_key', $apiKey)->first();
+
+        if (!$contract) {
+            return response()->json(['error' => 'Invalid API key'], 401);
+        }
+
+        $query = Geolocation::query();
+        if ($contract->country_code) {
+            $query->where('country_code', $contract->country_code);
+        }
+
+        $geolocations = $query->get();
+
+        $stations = Station::whereIn('name', $geolocations->pluck('station_name'))
+            ->whereBetween('longitude', [$contract->min_longitude, $contract->max_longitude])
+            ->whereBetween('latitude', [$contract->min_latitude, $contract->max_latitude])
+            ->whereBetween('elevation', [$contract->min_elevation, $contract->max_elevation])
+            ->get();
+
+        $weatherData = $stations->map(function ($station) {
+            return WeatherData::where('station_name', $station->name)->latest('date')->first();
+        })->filter()->sortByDesc('temp')->take(10);
+
+        return response()->json($weatherData->values()->all());
+    }
+
+    public function getColdestStations(Request $request)
+    {
+        $apiKey = $request->header('api-key');
+
+        $contract = Contract::where('api_key', $apiKey)->first();
+
+        if (!$contract) {
+            return response()->json(['error' => 'Invalid API key'], 401);
+        }
+
+        $query = Geolocation::query();
+        if ($contract->country_code) {
+            $query->where('country_code', $contract->country_code);
+        }
+
+        $geolocations = $query->get();
+        $stations = Station::whereIn('name', $geolocations->pluck('station_name'))
+            ->whereBetween('longitude', [$contract->min_longitude, $contract->max_longitude])
+            ->whereBetween('latitude', [$contract->min_latitude, $contract->max_latitude])
+            ->whereBetween('elevation', [$contract->min_elevation, $contract->max_elevation])
+            ->get();
+
+        $weatherData = $stations->map(function ($station) {
+            return WeatherData::where('station_name', $station->name)->latest('date')->first();
+        })->filter()->sortBy('temp')->take(10);
+
+        return response()->json($weatherData->values()->all());
+    }
 }
