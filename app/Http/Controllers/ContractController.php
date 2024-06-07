@@ -33,7 +33,9 @@ class ContractController extends Controller
             ->whereBetween('elevation', [$contract->min_elevation, $contract->max_elevation])
             ->get();
 
-        $weatherData = WeatherData::whereIn('station_name', $stations->pluck('name'))->get();
+        $weatherData = $stations->map(function ($station) {
+            return WeatherData::where('station_name', $station->name)->latest('date')->first();
+        });
 
         return response()->json($weatherData);
     }
