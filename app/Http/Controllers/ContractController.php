@@ -35,9 +35,9 @@ class ContractController extends Controller
 
         $weatherData = $stations->map(function ($station) {
             return WeatherData::where('station_name', $station->name)->latest('date')->first();
-        });
+        })->filter();
 
-        return response()->json($weatherData);
+        return response()->json($weatherData->values()->all());
     }
 
 
