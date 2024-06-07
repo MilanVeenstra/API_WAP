@@ -116,6 +116,11 @@ class ContractController extends Controller
             ->with('geolocation')
             ->get();
 
+        $stations = $stations->map(function ($station) {
+            $geolocation = $station->geolocation->makeHidden('id'); // Hide the id
+            return array_merge($station->makeHidden('geolocation')->toArray(), $geolocation->toArray());
+        });
+
         return response()->json($stations);
     }
 
