@@ -124,6 +124,56 @@ class ContractController extends Controller
         return response()->json($stations);
     }
 
+    public function getStationWithFilter(Request $request)
+    {
+        try {
+            $contract = $this->getContractFromApiKey($request);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+
+        $query = Geolocation::query();
+        if ($contract->country_code) {
+            $query->where('country_code', $contract->country_code);
+        }
+
+        $geolocations = $query->get();
+
+        $stationsQuery = Station::query();
+        $stationsQuery->whereIn('name', $geolocations->pluck('station_name'))
+            ->whereBetween('longitude', [$contract->min_longitude, $contract->max_longitude])
+            ->whereBetween('latitude', [$contract->min_latitude, $contract->max_latitude])
+            ->whereBetween('elevation', [$contract->min_elevation, $contract->max_elevation]);
+
+        $filters = ['country_code', 'island', 'county', 'place', 'hamlet', 'town', 'municipality', 'state_district', 'administrative', 'state', 'village', 'region', 'province', 'city', 'locality', 'postcode', 'country'];
+        foreach ($filters as $filter) {
+            if ($request->has($filter) && $request->input($filter) !== null) {
+                $stationsQuery->whereHas('geolocation', function ($query) use ($filter, $request) {
+                    $query->where($filter, $request->input($filter));
+                });
+            }
+        }
+
+        $stations = $stationsQuery->get();
+
+        if ($stations->isEmpty()) {
+            return response()->json(['message' => 'no stations found!']);
+        }
+
+        $stations = $stations->map(function ($station) {
+            $latestWeatherData = WeatherData::where('station_name', $station->name)->latest('date')->first();
+            return [
+                'station_name' => $station->name,
+                'longitude' => $station->longitude,
+                'latitude' => $station->latitude,
+                'elevation' => $station->elevation,
+                'temperature' => $latestWeatherData ? $latestWeatherData->temp : null
+            ];
+        });
+
+        return response()->json($stations);
+    }
+
 
     private function getContractFromApiKey(Request $request)
     {

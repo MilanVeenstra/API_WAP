@@ -15,6 +15,8 @@ Route::get('IWA/contracts/station-data', [ContractController::class, 'getStation
 Route::get('IWA/contracts/station-data-warmest', [ContractController::class, 'getWarmestStations']);
 Route::get('IWA/contracts/station-data-coldest', [ContractController::class, 'getColdestStations']);
 Route::get('IWA/contracts/station-list', [ContractController::class, 'getStationsWithGeolocation']);
+Route::get('IWA/contracts/station-list-filtered', [ContractController::class, 'getStationWithFilter']);
+
 
 
 
