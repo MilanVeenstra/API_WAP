@@ -169,7 +169,19 @@ class ContractController extends Controller
                 'longitude' => $station->longitude,
                 'latitude' => $station->latitude,
                 'elevation' => $station->elevation,
-                'temperature' => $latestWeatherData ? $latestWeatherData->temp : null
+                'data' => [
+                    'temp' => $latestWeatherData ? $latestWeatherData->temp : null,
+                    'dewp' => $latestWeatherData ? $latestWeatherData->dewp : null,
+                    'stp' => $latestWeatherData ? $latestWeatherData->stp : null,
+                    'slp' => $latestWeatherData ? $latestWeatherData->slp : null,
+                    'visib' => $latestWeatherData ? $latestWeatherData->visib : null,
+                    'wdsp' => $latestWeatherData ? $latestWeatherData->wdsp : null,
+                    'prcp' => $latestWeatherData ? $latestWeatherData->prcp : null,
+                    'sndp' => $latestWeatherData ? $latestWeatherData->sndp : null,
+                    'frshtt' => $latestWeatherData ? $latestWeatherData->frshtt : null,
+                    'cldc' => $latestWeatherData ? $latestWeatherData->cldc : null,
+                    'wnddir' => $latestWeatherData ? $latestWeatherData->wnddir : null
+                ]
             ];
         });
 
