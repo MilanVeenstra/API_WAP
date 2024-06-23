@@ -147,6 +147,10 @@ class ContractController extends Controller
             ->whereBetween('latitude', [$contract->min_latitude, $contract->max_latitude])
             ->whereBetween('elevation', [$contract->min_elevation, $contract->max_elevation]);
 
+        if ($request->has('station_name')) {
+            $stationsQuery->where('name', $request->input('station_name'));
+        }
+
         $filters = ['country_code', 'island', 'county', 'place', 'hamlet', 'town', 'municipality', 'state_district', 'administrative', 'state', 'village', 'region', 'province', 'city', 'locality', 'postcode', 'country'];
         foreach ($filters as $filter) {
             if ($request->has($filter) && $request->input($filter) !== null) {
