@@ -188,6 +188,24 @@ class ContractController extends Controller
         return response()->json($stations);
     }
 
+    public function getFilterVariables(Request $request)
+    {
+        try {
+            $contract = $this->getContractFromApiKey($request);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+
+        $filters = ['country_code', 'island', 'county', 'place', 'hamlet', 'town', 'municipality', 'state_district', 'administrative', 'state', 'village', 'region', 'province', 'city', 'locality', 'postcode', 'country'];
+        $filterValues = [];
+
+        foreach ($filters as $filter) {
+            $filterValues[$filter] = Geolocation::select($filter)->distinct()->get()->pluck($filter)->filter()->values();
+        }
+
+        return response()->json($filterValues);
+    }
+
 
     private function getContractFromApiKey(Request $request)
     {
