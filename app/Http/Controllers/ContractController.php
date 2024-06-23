@@ -162,35 +162,38 @@ class ContractController extends Controller
             return response()->json(['message' => 'no stations found!']);
         }
 
-        $stations = $stations->map(function ($station) {
-            $latestWeatherData = WeatherData::where('station_name', $station->name)->latest('date')->first();
-            if (!$latestWeatherData) {
-                return null;
+        $scope = $request->input('scope', 'recent');
+
+        $stations = $stations->map(function ($station) use ($scope) {
+            $query = WeatherData::where('station_name', $station->name);
+
+            if ($scope === 'all') {
+                $latestWeatherData = $query->latest('date')->take(10)->get();
+            } else {
+                $latestWeatherData = $query->latest('date')->first();
             }
+
+            if (!$latestWeatherData || $latestWeatherData->isEmpty()) {
+                return [
+                    'station_name' => $station->name,
+                    'longitude' => $station->longitude,
+                    'latitude' => $station->latitude,
+                    'elevation' => $station->elevation,
+                    'data' => 'No data found!'
+                ];
+            }
+
             return [
                 'station_name' => $station->name,
                 'longitude' => $station->longitude,
                 'latitude' => $station->latitude,
                 'elevation' => $station->elevation,
-                'data' => [
-                    'temp' => $latestWeatherData->temp,
-                    'dewp' => $latestWeatherData->dewp,
-                    'stp' => $latestWeatherData->stp,
-                    'slp' => $latestWeatherData->slp,
-                    'visib' => $latestWeatherData->visib,
-                    'wdsp' => $latestWeatherData->wdsp,
-                    'prcp' => $latestWeatherData->prcp,
-                    'sndp' => $latestWeatherData->sndp,
-                    'frshtt' => $latestWeatherData->frshtt,
-                    'cldc' => $latestWeatherData->cldc,
-                    'wnddir' => $latestWeatherData->wnddir
-                ]
+                'data' => $latestWeatherData
             ];
         })->filter();
 
         return response()->json($stations->values()->all());
     }
-
     public function getFilterVariables(Request $request)
     {
         try {
