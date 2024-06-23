@@ -170,10 +170,10 @@ class ContractController extends Controller
             if ($scope === 'all') {
                 $latestWeatherData = $query->latest('date')->take(10)->get();
             } else {
-                $latestWeatherData = $query->latest('date')->first();
+                $latestWeatherData = $query->latest('date')->take(1)->get();
             }
 
-            if (!$latestWeatherData || $latestWeatherData->isEmpty()) {
+            if ($latestWeatherData->isEmpty()) {
                 return [
                     'station_name' => $station->name,
                     'longitude' => $station->longitude,
