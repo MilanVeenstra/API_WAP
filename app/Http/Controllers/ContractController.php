@@ -213,6 +213,8 @@ class ContractController extends Controller
             $filterValues[$filter] = Geolocation::select($filter)->distinct()->get()->pluck($filter)->filter()->values();
         }
 
+        $filterValues['station_name'] = Station::select('name')->distinct()->get()->pluck('name')->filter()->values();
+
         return response()->json($filterValues);
     }
 
