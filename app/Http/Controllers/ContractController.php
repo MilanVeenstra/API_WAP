@@ -196,7 +196,7 @@ class ContractController extends Controller
             return response()->json(['error' => $e->getMessage()], 401);
         }
 
-        $filters = ['country_code', 'island', 'county', 'place', 'hamlet', 'town', 'municipality', 'state_district', 'administrative', 'state', 'village', 'region', 'province', 'city', 'locality', 'postcode', 'country'];
+        $filters = ['country_code', 'island', 'county', 'place', 'hamlet', 'town', 'municipality', 'state_district', 'administrative', 'state', 'village', 'region', 'province', 'city', 'locality', 'country'];
         $filterValues = [];
 
         foreach ($filters as $filter) {
